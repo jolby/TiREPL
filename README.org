@@ -30,8 +30,36 @@
    welcome. The transport layer allows a dual-mode operation. For
    direct telnet connections, you can simply enter raw javascript
    line-by line. You can also enter more complex data using irc-like
-   commands. These complex messages are JSON structures encoded as
+   commands. These messages are JSON structures encoded as
    base64 strings terminated by newlines.
+
+*** Commands
+    - /q or /quit 
+      Kill the current session and disconnect
+    - /session_id
+      Get the unique session_id for this active session
+    - /message <base64 encoded JSON message object> 
+      Encoded message object sent by the client
+    - /message_response <base64 encoded JSON message object> 
+      Encoded message reply sent back to the client by the REPL server
+
+*** Messages
+    Message objects are just JSON dictionaries the format is as
+    follows:
+
+    - Client request messages have the following keys/values:
+      - "session-id" - Id of session this message belongs to.
+      - "id"  Id of this message. Incremental id unique to this session.
+      - "type"  Message type of this message. Currently there is only
+        eval_src
+      - "src"  The javascript source we want eval'd on the remote mobile device
+      
+    - Server response message have the following keys/values:
+      - "session-id"  Id of session this message belongs to.
+      - "id"  Id of the message being replied to.
+      - "type"  Message type of this message. Currently there is only eval_response
+      - "status" status code for this evaluation, either ok or error
+      - "result" resulting object or exception object of the remote evaluation
 
 ** Remote clients
    Clients can simply be a telnet session connected directly to the
