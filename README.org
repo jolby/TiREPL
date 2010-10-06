@@ -71,13 +71,13 @@
 
 ** Installation
    To install these modules, you will need a fully working and recent
-   Titanium Developer installed and working correctly, as well as a
-   working Xcode and Android developer setup.
+   Titanium Developer installed, as well as a working Xcode and
+   Android developer setup.
    
 *** Files you may need to edit
     - For building for iPhone:
       replserver_iphone/ReplServer/titanium.xconfig
-      Make sure the file paths and titanium_mobil sdk match your system
+      Make sure the file paths and titanium_mobile sdk match your system
 
     - For building for Android:
       replserver_android/build.xml
@@ -93,6 +93,7 @@
     com.evocomputing.replserver-iphone-0.1.zip
     
     Now, copy this file to your Titanium directory:
+    shell:
 #+BEGIN_EXAMPLE 
     cp com.evocomputing.replserver-iphone-0.1.zip "/Library/Application Support/Titanium/"
 #+END_EXAMPLE
@@ -110,16 +111,36 @@
 *** Create titanium project that starts the ReplServer module
 **** Add ReplServer module to tiapp.xml
 **** Initial connection
-***** iPhone
-***** Android
-****** Open local proxy port for emulator using adb command shell
-          shell:
+     - iPhone
+     - Android
+       Open local proxy port for emulator using adb command shell
+       shell:
 #+BEGIN_EXAMPLE 
-          /opt/android-sdk/tools/adb forward tcp:5051 tcp:5051
+       /opt/android-sdk/tools/adb forward tcp:5051 tcp:5051
 #+END_EXAMPLE
-
+       
 * Usage
 ** Example session
+   shell:
+#+BEGIN_EXAMPLE 
+   telnet localhost 5061
+   Trying ::1...
+   Connected to localhost.
+   Escape character is '^]'.
+   Welcome to the ReplTest REPL Server
+
+   REPL> win1.backgroundColor = 'red';
+   red
+   REPL> replButton.height = 100;
+   100
+   REPL> win1.backgroundColor = 'blue';
+   blue
+   REPL> win2.backgroundColor = 'green';
+   green
+   REPL> /q
+   Bye!
+   Connection closed by foreign host.
+#+END_EXAMPLE
 
 
 * License
