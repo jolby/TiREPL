@@ -12,3 +12,4 @@ replserver_iphone/ReplServer/hooks/add.py
 replserver_iphone/ReplServer/hooks/install.py
 replserver_iphone/ReplServer/hooks/remove.py
 replserver_iphone/ReplServer/hooks/uninstall.py
+example/ReplTest/build

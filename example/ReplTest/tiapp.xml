@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ti:app xmlns:ti="http://ti.appcelerator.org">
+<id>com.evocomputing.repltest</id>
+<name>ReplTest</name>
+<version>1.0</version>
+<publisher>Evocomputing, Inc.</publisher>
+<url>http://evocomputing.com</url>
+<description>Test of interactive remote repl</description>
+<copyright>2010 by joel</copyright>
+<icon>default_app_logo.png</icon>
+    <persistent-wifi>false</persistent-wifi>
+    <prerendered-icon>false</prerendered-icon>
+    <statusbar-style>default</statusbar-style>
+    <statusbar-hidden>false</statusbar-hidden>
+    <fullscreen>false</fullscreen>
+    <navbar-hidden>false</navbar-hidden>
+    <analytics>false</analytics>
+<guid>41e3c8b0-03db-4893-a665-16832855224d</guid>
+<modules>
+<module version="0.1">com.evocomputing.replserver</module> </modules>
+</ti:app>
