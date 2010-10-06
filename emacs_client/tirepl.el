@@ -1,3 +1,27 @@
+;;; tirepl.el --- Read-Eval-Print Loop for Titanium written in Emacs Lisp
+
+;; Local modifications for running with Titanium by Joel Boehland
+
+;; This File uses code heavily ripped from SLIME, js-commint.
+;; Therefore original authors are the creators of those files, but the
+;; butchering is all my fault :-)
+
+;; Original Author: Helmut Eller and others
+;; Contributors: to many to mention
+;; License: GNU GPL (same license as Emacs)
+;; URL: http://github.com/jolby/TiREPL
+;; Keywords: languages, javascript, titanium
+;;
+;;; Description:
+;; This file implements a javascript Listener along with some niceties like
+;; a persistent history for communicating with a remote Titanium
+;; mobile device
+;;
+;;; Installation:
+;; Place this file on your load-path and '(require 'tirepl)
+
+;; tirepl
+
 (provide 'tirepl)
 
 (eval-when-compile
@@ -5,6 +29,7 @@
 
 (require 'json)
 (require 'pp)
+(require 'ido)
 
 (defface tirepl-repl-prompt-face
   '((((class color) (background light)) (:foreground "Purple"))

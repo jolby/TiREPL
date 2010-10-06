@@ -79,7 +79,7 @@
       replserver_iphone/ReplServer/titanium.xconfig
       Make sure the file paths and titanium_mobil sdk match your system
 
-    - For building for Android
+    - For building for Android:
       replserver_android/build.xml
       Make sure the required file paths match your system
 
