@@ -1,0 +1,60 @@
+#+OPTIONS: author:nil timestamp:nil
+
+Welcome to TiREPL!
+
+* Intro
+  TiREPL provides the facility for interactive editing of running
+  titanium mobile applications (sometimes called "Live Coding"). This
+  is done using Read Eval Print Loop (REPL) on the running
+  application connected to a client over a network transport
+  layer. Following is a short description of the main componenets.
+
+** ReplServer
+   The core of TiREPL are iPhone and Android modules that must be
+   installed along with the other modules in the mobile titanium
+   SDK. These modules are native code, Objective-C (for iPhone) and
+   Java (for Android). The main job of the ReplServer is to listen on
+   a configurable port for remote client connections. When it
+   recieves an incoming connection, it starts a REPL session with
+   that remote client. The REPL session accepts javascript code sent
+   by the client and executes it on the local javascript context of
+   the device. It then sends the response of the evaluation back down
+   to the remote client and waits for the remote client to send more
+   code to evaluate.
+
+** Transport Layer
+   For sending data back and forth between the ReplServer on the
+   mobile device and the remote client, a very simple line-oriented
+   protocol is used. This was chosen because it was simple to
+   bootstrap and test using telnet. Feedback on the protocol is
+   welcome. The transport layer allows a dual-mode operation. For
+   direct telnet connections, you can simply enter raw javascript
+   line-by line. You can also enter more complex data using irc-like
+   commands. These complex messages are JSON structures encoded as
+   base64 strings terminated by newlines.
+
+** Remote clients
+   Clients can simply be a telnet session connected directly to the
+   raw socket, or a client can provide more features such as input
+   history, error reporting etc using the JSON encoded messaging
+   interface. There is an emacs client interface provided with this
+   project that uses the messaging interface.
+
+** Installation
+*** Install iPhone module into titanium mobile SDK
+*** Install Android module into titanium mobile SDK
+*** Create titanium project that starts the ReplServer module
+**** Add ReplServer module to tiapp.xml
+**** Initial connection
+***** iPhone
+***** Android
+****** Open local proxy port for emulator using adb command shell
+          shell:
+#+BEGIN_EXAMPLE 
+          /opt/android-sdk/tools/adb forward tcp:5051 tcp:5051
+#+END_EXAMPLE
+
+* Usage
+** Example session
+
+
