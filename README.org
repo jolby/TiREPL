@@ -123,6 +123,6 @@
 
 
 * License
-  Except where noted, this is all licensed under that Apache License
-  v2, same as Appcelerator. The emacs lisp code is licensed under the
+  Except where noted, this is all licensed under the Apache License
+  v2, same as Appcelerator Titanium. The emacs lisp code is licensed under the
   GPL, because it is derived from other GPL'd sources.
