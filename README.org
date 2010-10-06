@@ -7,7 +7,7 @@
   titanium mobile applications (sometimes called "Live Coding"). This
   is done using Read Eval Print Loop (REPL) on the running
   application connected to a client over a network transport
-  layer. Following is a short description of the main componenets.
+  layer. Following is a short description of the main components.
 
 ** ReplServer
    The core of TiREPL are iPhone and Android modules that must be
