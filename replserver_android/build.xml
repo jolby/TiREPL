@@ -1,0 +1,84 @@
+<project default="build">
+  <property file="build.properties"/>
+  <property name="distdir" value="${basedir}/build"/>
+  <property name="classesdir" value="${distdir}/classes"/>
+  <property name="build.version" value="1.0.0"/>
+  <available property="distdir-available" file="${distdir}"/>
+
+  <property name="android.sdk" value="/opt/android-sdk"/>
+  <property name="android.platform" value="${android.sdk}/platforms/android-7"/>
+  
+  <!--
+      <property name="google.apis" value="${android.sdk}/add-ons/google_apis-4_r02"/>
+      <available property="google-apis-available" file="${google.apis}"/>
+  -->
+  
+  <property name="titanium.sdk.dir" value="/Library/Application Support/Titanium/mobilesdk/osx/1.4.1/android"/>
+  <property name="titanium.jar" value="${titanium.sdk.dir}/titanium.jar"/>        
+  <property name="titanium.sdk.modules.dir" value="${titanium.sdk.dir}/modules"/>
+  
+  <path id="android">
+    <pathelement path="${android.platform}/android.jar"/>
+    <pathelement path="${google.apis}/libs/maps.jar"/>
+  </path>
+
+  <path id="titanium">
+    <!-- <pathelement path="${titanium.jar}"/> -->
+    <fileset dir="${titanium.sdk.dir}" includes="*.jar"/>
+    <fileset dir="${titanium.sdk.modules.dir}" includes="**/*.jar"/>
+  </path>
+
+
+  <macrodef name="require-file-prop">
+    <attribute name="property"/> 
+    <attribute name="file"/>          
+    <sequential> 
+      <fail message="Required property @{property} does not exist. Please read the README and set the required properties."> 
+        <condition> 
+          <not><isset property="@{property}"/></not> 
+        </condition>
+      </fail>
+      <fail message="Required file: @{file} set in property: @{property} does not exist. Please read the README and set the required file paths."> 
+        <condition> 
+          <not><available file="@{file}"/></not> 
+        </condition> 
+      </fail> 
+    </sequential> 
+  </macrodef>
+
+  <target name="check-files-and-props">
+    <require-file-prop property="android.sdk"  file="${android.sdk}"/>
+    <require-file-prop property="android.platform"  file="${android.platform}"/>
+    <require-file-prop property="titanium.sdk.dir"  file="${titanium.sdk.dir}"/>
+    <require-file-prop property="titanium.jar"  file="${titanium.jar}"/>
+    <require-file-prop property="titanium.sdk.modules.dir"  file="${titanium.sdk.modules.dir}"/>
+  </target>
+
+  <target name="clean" if="distdir-available">
+    <delete includeemptydirs="true">
+      <fileset dir="${distdir}" includes="**/*" defaultexcludes="false"/>
+    </delete>
+  </target>
+
+  <target name="build" depends="check-files-and-props">
+    <mkdir dir="${classesdir}"/>
+    
+    <javac destdir="${classesdir}"
+	   includes="**/*"
+	   source="1.5"
+           debug="true"
+	   includeantruntime="false">
+      <src path="src"/>
+      <classpath refid="android"/>
+      <classpath refid="titanium"/>				
+    </javac>
+    
+    <jar destfile="${distdir}/titanium-repl.jar" basedir="${classesdir}"/>
+  </target>
+  
+
+  <target name="deploy" depends="clean, build">
+    <copy file="${distdir}/titanium-repl.jar" todir="${titanium.sdk.modules.dir}"/>
+  </target>
+  
+</project>

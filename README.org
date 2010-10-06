@@ -27,11 +27,12 @@
    mobile device and the remote client, a very simple line-oriented
    protocol is used. This was chosen because it was simple to
    bootstrap and test using telnet. Feedback on the protocol is
-   welcome. The transport layer allows a dual-mode operation. For
-   direct telnet connections, you can simply enter raw javascript
-   line-by line. You can also enter more complex data using irc-like
-   commands. These messages are JSON structures encoded as
-   base64 strings terminated by newlines.
+   welcome- it is pretty ad hoc but it was easy to get started. The
+   transport layer allows a dual-mode operation. For direct telnet
+   connections, you can simply enter raw javascript line-by line. You
+   can also enter more complex data using irc-like commands. These
+   messages are JSON structures encoded as base64 strings terminated
+   by newlines.
 
 *** Commands
     - /q or /quit 
@@ -44,7 +45,7 @@
       Encoded message reply sent back to the client by the REPL server
 
 *** Messages
-    Message objects are just JSON dictionaries the format is as
+    Message objects are just JSON dictionaries. The format is as
     follows:
 
     - Client request messages have the following keys/values:
@@ -69,8 +70,43 @@
    project that uses the messaging interface.
 
 ** Installation
+   To install these modules, you will need a fully working and recent
+   Titanium Developer installed and working correctly, as well as a
+   working Xcode and Android developer setup.
+   
+*** Files you may need to edit
+    - For building for iPhone:
+      replserver_iphone/ReplServer/titanium.xconfig
+      Make sure the file paths and titanium_mobil sdk match your system
+
+    - For building for Android
+      replserver_android/build.xml
+      Make sure the required file paths match your system
+
 *** Install iPhone module into titanium mobile SDK
+    shell:
+#+BEGIN_EXAMPLE 
+    cd replserver_iphone/ReplServer
+    python ./build.py
+#+END_EXAMPLE
+    You should now have a file:
+    com.evocomputing.replserver-iphone-0.1.zip
+    
+    Now, copy this file to your Titanium directory:
+#+BEGIN_EXAMPLE 
+    cp com.evocomputing.replserver-iphone-0.1.zip "/Library/Application Support/Titanium/"
+#+END_EXAMPLE
+    Titanium should pick this up and install it in the correct directory.
+    
 *** Install Android module into titanium mobile SDK
+    shell:
+#+BEGIN_EXAMPLE 
+    cd replserver_android/
+    ant deploy
+#+END_EXAMPLE
+    This will build the titanium-repl.jar, and install it with the
+    other jars in the mobile sdk
+
 *** Create titanium project that starts the ReplServer module
 **** Add ReplServer module to tiapp.xml
 **** Initial connection

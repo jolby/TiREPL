@@ -1,1 +1,14 @@
 replserver_android/build
+replserver_iphone/ReplServer/replserver.xcodeproj/joel.mode2v3
+replserver_iphone/ReplServer/replserver.xcodeproj/joel.pbxuser
+replserver_iphone/ReplServer/LICENSE
+replserver_iphone/ReplServer/README
+replserver_iphone/ReplServer/Rakefile
+replserver_iphone/ReplServer/assets/README
+replserver_iphone/ReplServer/documentation/index.md
+replserver_iphone/ReplServer/example/app.js
+replserver_iphone/ReplServer/hooks/README
+replserver_iphone/ReplServer/hooks/add.py
+replserver_iphone/ReplServer/hooks/install.py
+replserver_iphone/ReplServer/hooks/remove.py
+replserver_iphone/ReplServer/hooks/uninstall.py

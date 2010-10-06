@@ -1,0 +1,17 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 0.1
+description: ReplServer
+author: Joel Boehland (Evocomputing, Inc.)
+license: Specify your license
+copyright: Copyright (c) 2010 by Your Company
+
+
+# these should not be edited
+name: replserver
+moduleid: com.evocomputing.replserver
+guid: 8dc1db0c-42eb-45c5-8f26-7d52725f1e4a
+platform: iphone
+minsdk: 1.4.80
