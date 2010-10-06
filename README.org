@@ -1,7 +1,7 @@
 #+OPTIONS: author:nil timestamp:nil
-
-Welcome to TiREPL!
-
+* Status
+  I'm just getting this project set up, so docs and code are buggy and
+  missing until I update this document.
 * Intro
   TiREPL provides the facility for interactive editing of running
   titanium mobile applications (sometimes called "Live Coding"). This
