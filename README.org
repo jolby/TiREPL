@@ -120,6 +120,8 @@
 #+END_EXAMPLE
        
 * Usage
+  See the app.js file in the examples/ReplTest example project for how
+  to integrate the module in your titanium application.
 ** Example session
    shell:
 #+BEGIN_EXAMPLE 
