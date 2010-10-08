@@ -31,29 +31,48 @@
 (require 'pp)
 (require 'ido)
 
+(defgroup tirepl nil
+  "The Read-Eval-Print Loop for remote Titanium applications."
+  :prefix "tirepl-"
+  :group 'applications)
+
 (defface tirepl-repl-prompt-face
   '((((class color) (background light)) (:foreground "Purple"))
     (((class color) (background dark)) (:foreground "Cyan"))
     (t (:weight bold)))
   "Face for the prompt in the TIREPL REPL."
-  :group 'tirepl-repl)
+  :group 'tirepl)
 
 (defface tirepl-repl-output-face
   '((((class color) (background light)) (:foreground "RosyBrown"))
     (((class color) (background dark)) (:foreground "LightSalmon"))
+  ;;'((((class color) (background light)) (:foreground "red"))
+  ;; (((class color) (background dark)) (:foreground "red"))
     (t (:slant italic)))
   "Face for Lisp output in the TIREPL REPL."
-  :group 'tirepl-repl)
+  :group 'tirepl)
 
 (defface tirepl-repl-input-face
   '((t (:bold t)))
   "Face for previous input in the TIREPL REPL."
-  :group 'tirepl-repl)
+  :group 'tirepl)
 
 (defface tirepl-repl-result-face
   '((t ()))
   "Face for the result of an evaluation in the TIREPL REPL."
-  :group 'tirepl-repl)
+  :group 'tirepl)
+
+(defface tirepl-repl-result-error-face
+  '((((class color) (background light)) (:foreground "red"))
+    (((class color) (background dark)) (:foreground "red"))
+    (t (:weight bold)))
+  "Face for the result of an evaluation that caused an error in the TIREPL REPL."
+  :group 'tirepl)
+
+(defcustom tirepl-repl-wrap-history nil
+  "*T to wrap history around when the end is reached."
+  :type 'boolean
+  :group 'tirepl)
 
 (make-variable-buffer-local
  (defvar tirepl-repl-output-start nil
@@ -363,21 +382,43 @@ callbacks list to call later with the result."
           (setq session (call-interactively 'tirepl-session-make-session-prompt))))
   session))
 
-(defun tirepl-eval-js-in-region (start end)
+(defun tirepl-eval-send-region (start end)
   (interactive "r")
   (let ((session (tirepl-session-default-or-create))
         (src (buffer-substring start end)))
+    (message "sending region: %s" src)
     (tirepl-session-eval
      (tirepl-session-current-session) src
      (lambda (result) (message "%s" result)))))
 
-(defun tirepl-eval-js-in-region-and-insert (start end)
+(defun tirepl-eval-send-region-and-insert (start end)
   (interactive "r")
   (let ((session (tirepl-session-default-or-create))
         (src (buffer-substring start end)))
     (tirepl-session-eval
      (tirepl-session-current-session) src
      (lambda (result) (beginning-of-line 2) (insert result)))))
+
+(defun tirepl-eval-echo-defun ()
+  (interactive)
+  (save-excursion
+    (mark-defun)
+    (let ((src (buffer-substring (point) (mark))))
+      (message "defun: \n%s" src))))
+
+(defun tirepl-eval-send-defun ()
+  (interactive)
+  (save-excursion
+    (mark-defun)
+    (tirepl-eval-send-region (point) (mark))))
+
+(defun tirepl-eval-send-expression ()
+  (interactive )
+  )
+
+(defun tirepl-eval-send-buffer ()
+  (interactive)
+  )
 
 (defun tirepl-js-make-scratch-buffer (buffer-name)
   (interactive
@@ -415,7 +456,7 @@ callbacks list to call later with the result."
 
 (defun tirepl-repl-mark-output-end ()
   (add-text-properties tirepl-repl-output-start tirepl-repl-output-end
-                       '(face tirepl-repl-output-face 
+                       '(;;face tirepl-repl-output-face 
                          rear-nonsticky (face))))
 
 (defun tirepl-repl-reset-repl-markers ()
@@ -468,11 +509,9 @@ Return the position of the prompt beginning."
       (let* ((buffer-name (format "*TiREPL-%s*" (plist-get session :name)))
              (buffer (generate-new-buffer buffer-name)))
         (with-current-buffer buffer
-          (unless (eq major-mode 'tirepl-repl-mode) 
-            (tirepl-mode))
-
-          (tirepl-session-bind-repl-buffer session buffer)
+          (tirepl-repl-mode)
           
+          (tirepl-session-bind-repl-buffer session buffer)          
           (add-hook 'kill-buffer-hook 'tirepl-session-unbind-repl-buffer t t)
 
           (tirepl-repl-reset-repl-markers)
@@ -526,7 +565,6 @@ Return the position of the prompt beginning."
     (tirepl-repl-add-to-input-history
      (buffer-substring tirepl-repl-input-start-mark end))
     (tirepl-repl-show-maximum-output)
-
     (let ((overlay (make-overlay tirepl-repl-input-start-mark end)))
       ;; These properties are on an overlay so that they won't be taken
       ;; by kill/yank.
@@ -572,7 +610,8 @@ Return the position of the prompt beginning."
             (when (not (bolp)) (insert-before-markers "\n"))
             
             (tirepl-repl-propertize-region
-             `(face tirepl-repl-output-face rear-nonsticky (face))
+             `(face tirepl-repl-result-error-face rear-nonsticky (face))
+             ;;`(face tirepl-repl-output-face rear-nonsticky (face))
              (insert-before-markers
               (format "Error during remote evaluation:\n")
               string))))))
@@ -640,11 +679,6 @@ Return the position of the prompt beginning."
        (not (get-char-property (point) property))))
 
 ;;; Repl History
-(defcustom tirepl-repl-wrap-history nil
-  "*T to wrap history around when the end is reached."
-  :type 'boolean
-  :group 'tirepl-repl)
-
 (make-variable-buffer-local
  (defvar tirepl-repl-input-history '()
    "History list of strings read from the REPL buffer."))
@@ -784,13 +818,28 @@ history entries while navigating the repl history."
 
 (put 'tirepl-define-keys 'lisp-indent-function 1)
 
-(defvar tirepl-mode-hook nil)
-
-(defvar tirepl-mode-map
+(defvar tirepl-eval-mode-map
   (let ((keymap (make-sparse-keymap)))
-    (set-keymap-parent keymap espresso-mode-map)))
+    keymap))
 
-(tirepl-define-keys tirepl-mode-map
+(tirepl-define-keys tirepl-eval-mode-map
+  ("\C-c\C-r" 'tirepl-eval-send-region)
+  ("\C-x\C-e" 'tirepl-eval-send-defun)
+  ("\C-c :" 'tirepl-eval-send-expression)
+  )
+
+(define-minor-mode tirepl-eval-mode
+  "Minor mode for interactive development with remote Titanium devices." nil " TiREPL-eval"
+  :keymap tirepl-eval-mode-map
+  :group 'tirepl
+  :global nil)
+
+
+(defvar tirepl-repl-mode-map
+  (let ((keymap (make-sparse-keymap)))
+    keymap))
+
+(tirepl-define-keys tirepl-repl-mode-map
   ("\C-m" 'tirepl-repl-return)
   ([return] 'tirepl-repl-return)
   ("\C-a" 'tirepl-repl-bol)
@@ -802,64 +851,90 @@ history entries while navigating the repl history."
   ("\C-c\C-n" 'tirepl-repl-next-prompt)
   ("\C-c\C-p" 'tirepl-repl-previous-prompt))
 
-(defun tirepl-mode ()
-  "Major mode for interactive development with remote Titanium devices."
-  (interactive)
-  (kill-all-local-variables)
-  (setq major-mode 'tirepl-mode)
-  (setq mode-name "TiREPL")
-  (use-local-map tirepl-mode-map)
+(easy-menu-define nil tirepl-repl-mode-map "TiREPL"
+  '("TiREPL"
+    ["Eval expression in remote Titanium device..." tirepl-eval-send-expression]))
+    
 
-  (set (make-local-variable 'scroll-conservatively) 20)
-  (set (make-local-variable 'scroll-margin) 0)
+(define-minor-mode tirepl-repl-mode
+  "Minor mode for interactive development with remote Titanium devices." nil " TiREPL"
+  :keymap tirepl-repl-mode-map
+  :group 'tirepl
+  :global nil)
+
+;; (defun tirepl-mode ()
+;;   "Major mode for interactive development with remote Titanium devices."
+;;   (interactive)
+;;   (kill-all-local-variables)
+;;   (setq major-mode 'tirepl-mode)
+;;   (setq mode-name "TiREPL")
+;;   (use-local-map tirepl-mode-map)
+
+;;   (set (make-local-variable 'scroll-conservatively) 20)
+;;   (set (make-local-variable 'scroll-margin) 0)
   
-  (run-hooks 'tirepl-mode-hook))
-
+;;   (run-hooks 'tirepl-mode-hook))
 
 ;;; Testing
-(defun tirepl-test-net-send ()
-  (interactive)
-  (let* ((proc (tirepl-net-connect "localhost" 5051)))
-    (sleep-for 1)
-    (tirepl-net-send-raw "repl.status();\n" proc)
-    (sleep-for 5)
-    (tirepl-net-close proc)))
+;;; Commented out for now- most of this is particular to my setup, but
+;;; feel free to use as a template for you own local testing
+;;;
+;; (defun tirepl-test-net-send ()
+;;   (interactive)
+;;   (let* ((proc (tirepl-net-connect "localhost" 5051)))
+;;     (sleep-for 1)
+;;     (tirepl-net-send-raw "repl.status();\n" proc)
+;;     (sleep-for 5)
+;;     (tirepl-net-close proc)))
 
-(defun tirepl-test-create-session ()
-  (interactive)
-  (let* ((sess (tirepl-session-make-session "localhost" 5051)))
-    (sleep-for 1)
-    (message "Created session: %s" sess)))
+;; (defun tirepl-test-create-session ()
+;;   (interactive)
+;;   (let* ((sess (tirepl-session-make-session "localhost" 5051)))
+;;     (sleep-for 1)
+;;     (message "Created session: %s" sess)))
 
-(defun tirepl-test-create-session-iphone ()
-  (interactive)
-  (let* ((sess (tirepl-session-make-session "localhost" 5061)))
-    (sleep-for 1)
-    (message "Created session: %s" sess)))
+;; (defun tirepl-test-create-session-iphone ()
+;;   (interactive)
+;;   (let* ((sess (tirepl-session-make-session "localhost" 5061)))
+;;     (sleep-for 1)
+;;     (message "Created session: %s" sess)))
 
-(defun tirepl-test-round-trip-message ()
-  (tirepl-session-end-all-sessions)
-  (tirepl-session-make-session)
-  (tirepl-session-eval (tirepl-session-current-session) "repl.isRunning();\nrepl.status();"
-                       (lambda (info) (message "Got reply: %s" info)))
-  (sleep-for 5)
-  (tirepl-session-end-all-sessions))
+;; (defun tirepl-test-round-trip-message ()
+;;   (tirepl-session-end-all-sessions)
+;;   (tirepl-session-make-session)
+;;   (tirepl-session-eval (tirepl-session-current-session) "repl.isRunning();\nrepl.status();"
+;;                        (lambda (info) (message "Got reply: %s" info)))
+;;   (sleep-for 5)
+;;   (tirepl-session-end-all-sessions))
 
-(defun tirepl-test-round-trip-iphone ()
-  (tirepl-session-end-all-sessions)
-  (tirepl-session-make-session "localhost" 5061)
-  (sleep-for 1)
-  (tirepl-session-eval (tirepl-session-current-session) "replserver.isRunning();\nreplserver.status();"
-                       (lambda (info) (message "Got reply: %s" info)))
-  (sleep-for 5)
-  (tirepl-session-end-all-sessions))
+;; (defun tirepl-test-round-trip-iphone ()
+;;   (tirepl-session-end-all-sessions)
+;;   (tirepl-session-make-session "localhost" 5061)
+;;   (sleep-for 1)
+;;   (tirepl-session-eval (tirepl-session-current-session) "replserver.isRunning();\nreplserver.status();"
+;;                        (lambda (info) (message "Got reply: %s" info)))
+;;   (sleep-for 5)
+;;   (tirepl-session-end-all-sessions))
 
-(defun tirepl-test-make-json-msg ()
-  (let ((session-id 1)
-        (msg-id 23)
-        (js-src "win1.backgroundColor = 'red';"))
-  (json-encode-plist `(:session-id ,session-id
-                                   :id ,msg-id :type "eval_src" :src ,js-src))))
+;; (defun tirepl-test-make-json-msg ()
+;;   (let ((session-id 1)
+;;         (msg-id 23)
+;;         (js-src "win1.backgroundColor = 'red';"))
+;;   (json-encode-plist `(:session-id ,session-id
+;;                                    :id ,msg-id :type "eval_src" :src ,js-src))))
 
-(defun tirepl-test-make-b64-msg ()
-  (base64-encode-string  (tirepl-test-make-json-msg) t))
+;; (defun tirepl-test-make-b64-msg ()
+;;   (base64-encode-string  (tirepl-test-make-json-msg) t))
+
+
+;;; Setting up testing workspaces
+;; (defun ka ()
+;;   "Kill all sessions, unload tirepl, then reload"
+;;   (tirepl-session-end-all-sessions)
+;;   (unload-feature 'tirepl)
+;;   (eval-buffer "tirepl.el")
+
+;; (defun ws ()
+;;   "Set up workspace with a session connected to localhost on port 5061"
+;;   (tirepl-session-make-session "localhost" 5061)
+;;   (tirepl-repl-switch-to-output-buffer))
