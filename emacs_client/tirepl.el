@@ -583,40 +583,42 @@ Return the position of the prompt beginning."
   (tirepl-repl-send-input))
 
 (defun tirepl-repl-emit-result (string &optional bol)
-  ;; insert STRING and mark it as evaluation result  
-  (with-current-buffer (tirepl-repl-output-buffer)
-    (when string ;;only insert if not nil
-      (save-excursion
-        (tirepl-repl-save-marker tirepl-repl-output-start
-          (tirepl-repl-save-marker tirepl-repl-output-end
-            (goto-char tirepl-repl-input-start-mark)
-            ;;(when (and bol (not (bolp))) (insert-before-markers "\n"))
-            (when (not (bolp)) (insert-before-markers "\n"))
-            (tirepl-repl-propertize-region `(face tirepl-repl-result-face
-                                                  rear-nonsticky (face))
-                                           (insert-before-markers string))))))
-    (tirepl-repl-insert-prompt)
-    (tirepl-repl-show-maximum-output)))
+  ;; insert STRING and mark it as evaluation result
+  (let ((string (if (stringp string) string (format "%s" string))))
+    (with-current-buffer (tirepl-repl-output-buffer)
+      (when string ;;only insert if not nil
+        (save-excursion
+          (tirepl-repl-save-marker tirepl-repl-output-start
+            (tirepl-repl-save-marker tirepl-repl-output-end
+              (goto-char tirepl-repl-input-start-mark)
+              ;;(when (and bol (not (bolp))) (insert-before-markers "\n"))
+              (when (not (bolp)) (insert-before-markers "\n"))
+              (tirepl-repl-propertize-region `(face tirepl-repl-result-face
+                                                    rear-nonsticky (face))
+                                             (insert-before-markers string))))))
+      (tirepl-repl-insert-prompt)
+      (tirepl-repl-show-maximum-output))))
 
 (defun tirepl-repl-emit-error (string &optional bol)
-  ;; insert STRING and mark it as evaluation result  
-  (with-current-buffer (tirepl-repl-output-buffer)
-    (when string ;;only insert if not nil
-      (save-excursion
-        (tirepl-repl-save-marker tirepl-repl-output-start
-          (tirepl-repl-save-marker tirepl-repl-output-end
-            (goto-char tirepl-repl-input-start-mark)
-            ;;(when (and bol (not (bolp))) (insert-before-markers "\n"))
-            (when (not (bolp)) (insert-before-markers "\n"))
+  ;; insert STRING and mark it as evaluation result
+  (let ((string (if (stringp string) string (format "%s" string))))
+    (with-current-buffer (tirepl-repl-output-buffer)
+      (when string ;;only insert if not nil
+        (save-excursion
+          (tirepl-repl-save-marker tirepl-repl-output-start
+            (tirepl-repl-save-marker tirepl-repl-output-end
+              (goto-char tirepl-repl-input-start-mark)
+              ;;(when (and bol (not (bolp))) (insert-before-markers "\n"))
+              (when (not (bolp)) (insert-before-markers "\n"))
             
-            (tirepl-repl-propertize-region
-             `(face tirepl-repl-result-error-face rear-nonsticky (face))
-             ;;`(face tirepl-repl-output-face rear-nonsticky (face))
-             (insert-before-markers
-              (format "Error during remote evaluation:\n")
-              string))))))
-    (tirepl-repl-insert-prompt)
-    (tirepl-repl-show-maximum-output)))
+              (tirepl-repl-propertize-region
+               `(face tirepl-repl-result-error-face rear-nonsticky (face))
+               ;;`(face tirepl-repl-output-face rear-nonsticky (face))
+               (insert-before-markers
+                (format "Error during remote evaluation:\n")
+                string))))))
+      (tirepl-repl-insert-prompt)
+      (tirepl-repl-show-maximum-output))))
 
 (defun tirepl-repl-delete-current-input ()
   "Delete all text from the prompt."
