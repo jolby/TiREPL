@@ -35,6 +35,8 @@ import org.appcelerator.titanium.TiDict;
 import org.appcelerator.titanium.TiProxy;
 import org.appcelerator.titanium.TiContext;
 import org.appcelerator.titanium.util.Log;
+import org.appcelerator.titanium.util.TiConvert;
+//import org.appcelerator.titanium.kroll.KrollDict;
 import org.appcelerator.titanium.kroll.KrollContext;
 import org.appcelerator.titanium.kroll.KrollBridge;
 
@@ -42,19 +44,26 @@ public class ReplServer {
 
     private TiProxy proxy;
     private ReplListener listener = null;
-    private int port;
+    private int listenPort;
 
     private static final String LCAT = "ReplServer";
     private static final boolean DBG = true;
 
 
+    public ReplServer(TiProxy proxy, TiDict options) {
+        this.proxy = proxy;
+        if(options.containsKey("listenPort")) {
+            this.listenPort = TiConvert.toInt(options, "listenPort");
+        }
+    }
+        
     public ReplServer(TiProxy proxy) {
         this.proxy = proxy;
     }
 
     public void start() {
         if (DBG) { Log.w(LCAT, "Repl Server Start..."); }
-        listener = new ReplListener(5051);
+        listener = new ReplListener(this.listenPort);
         new Thread(listener, "ReplServerListenerThread").start();
     }
 
@@ -66,12 +75,12 @@ public class ReplServer {
         }
     }
 
-    public int getPort() {
-        return port;
+    public int getListenPort() {
+        return listenPort;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public void setListenPort(int port) {
+        this.listenPort = port;
     }
 
     public boolean isRunning() {

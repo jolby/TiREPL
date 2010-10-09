@@ -24,8 +24,12 @@ public class ReplServerProxy extends TiProxy {
         replServer.stop();
     }
     
-    public int getPort() {
-        return replServer.getPort();
+    public int getListenPort() {
+        return replServer.getListenPort();
+    }
+
+    public void setListenPort(int port) {
+        replServer.setListenPort(port);
     }
 
     public boolean isRunning() {
