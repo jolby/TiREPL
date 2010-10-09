@@ -1,11 +1,16 @@
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
 
-//var repl = Titanium.Repl.createReplServer();
-var replserverModule = require('com.evocomputing.replserver');
-Ti.API.info("module is => "+replserverModule);
+if(Ti.Platform.osname == 'android') {
+  var repl = Titanium.Repl.createReplServer();
+}
+else if (Ti.Platform.osname == 'iphone'){
+  var replserverModule = require('com.evocomputing.replserver');
+  Ti.API.info("module is => "+replserverModule);
+  var repl = Titanium.Repl.createReplServer();
+}
 
-var repl = replserverModule.createReplServer({'listenPort' : 5071});
+
 
 //show getting/setting properties
 Ti.API.info("repl: "+repl);
