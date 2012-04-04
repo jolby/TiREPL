@@ -13,7 +13,7 @@
       <available property="google-apis-available" file="${google.apis}"/>
   -->
   
-  <property name="titanium.sdk.dir" value="/Library/Application Support/Titanium/mobilesdk/osx/1.4.1/android"/>
+  <property name="titanium.sdk.dir" value="/Users/joel/Library/Application Support/Titanium/mobilesdk/osx/1.4.1.1/android"/>
   <property name="titanium.jar" value="${titanium.sdk.dir}/titanium.jar"/>        
   <property name="titanium.sdk.modules.dir" value="${titanium.sdk.dir}/modules"/>
   

@@ -1,7 +1,12 @@
 #+OPTIONS: author:nil timestamp:nil
 * Status
-  I'm just getting this project set up, so docs and code are buggy and
-  missing until I update this document.
+  (2012-04-04) This project is broken. Don't try to use - it won't work. It is mostly a hack based on an old verion of titanium. A much simpler/better approach is done in the Titanium Logger project:
+  
+  https://github.com/sr3d/titanium_logger
+
+  I have some vague plans to use the approach in Titanium Logger but with clojurescript.
+
+
 * Intro
   TiREPL provides the facility for interactive editing of running
   titanium mobile applications (sometimes called "Live Coding"). This

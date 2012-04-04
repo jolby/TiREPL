@@ -2,7 +2,7 @@
 Titanium.UI.setBackgroundColor('#000');
 
 if(Ti.Platform.osname == 'android') {
-  var repl = Titanium.Repl.createReplServer();
+  var repl = Titanium.Repl.createReplServer({'listenPort':5061});
 }
 else if (Ti.Platform.osname == 'iphone'){
   var replserverModule = require('com.evocomputing.replserver');
@@ -15,7 +15,7 @@ else if (Ti.Platform.osname == 'iphone'){
 //show getting/setting properties
 Ti.API.info("repl: "+repl);
 Ti.API.info("repl.port: "+repl.listenPort);
-repl.listenPort = 5061;
+  //repl.listenPort = 5061;
 Ti.API.info("repl.port: "+repl.listenPort);
 Ti.API.info("repl.isRunning: "+repl.running);
 
